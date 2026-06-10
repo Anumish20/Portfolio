@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Anubhuti Mishra — Portfolio
 
-## Getting Started
+A full-stack developer portfolio built with Next.js. More than a static page: it
+ships a real database-backed contact form, a live DB health probe, and a
+"behind the scenes" inspector that documents how each section is actually built.
 
-First, run the development server:
+**Live:** https://anubhuti-mishra.vercel.app
+
+## Tech stack
+
+- **Framework:** Next.js 16 (App Router) + React 19, TypeScript
+- **Styling/animation:** Tailwind CSS v4, Framer Motion
+- **Backend:** Next.js Route Handlers (Node runtime)
+- **Database:** Neon PostgreSQL via Prisma 7 (`@prisma/adapter-pg`)
+- **Validation:** Zod
+- **Hosting:** Vercel
+
+## Architecture notes
+
+- All page content lives in `lib/data.ts` — a single source of truth, so editing
+  the portfolio never means touching JSX.
+- `POST /api/contact` re-validates every submission server-side with Zod before
+  persisting to Postgres — the browser validation is only for UX.
+- `GET /api/health` runs `SELECT 1` to prove the DB is reachable in real time.
+- Prisma uses the **pooled** `DATABASE_URL` at runtime and the **direct**
+  `DIRECT_URL` for migrations (see `prisma.config.ts`).
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create a `.env` with your Neon connection strings:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+DATABASE_URL="postgresql://...-pooler.../neondb?sslmode=require"
+DIRECT_URL="postgresql://.../neondb?sslmode=require"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment (Vercel)
 
-## Learn More
+The build command runs migrations then builds:
 
-To learn more about Next.js, take a look at the following resources:
+```
+prisma generate && prisma migrate deploy && next build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Set both `DATABASE_URL` and `DIRECT_URL` as environment variables in the Vercel
+project before the first build.
