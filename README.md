@@ -4,7 +4,7 @@ A full-stack developer portfolio built with Next.js. More than a static page: it
 ships a real database-backed contact form, a live DB health probe, and a
 "behind the scenes" inspector that documents how each section is actually built.
 
-**Live:** https://anubhuti-mishra.vercel.app
+**Live:** https://anubhuti-portfolio.vercel.app/
 
 ## Tech stack
 
