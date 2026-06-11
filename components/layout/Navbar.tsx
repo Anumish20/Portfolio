@@ -59,6 +59,24 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
 
+  // Mobile menu links live inside an AnimatePresence sheet that unmounts on
+  // tap. Relying on the anchor's default hash-scroll races that unmount, and
+  // mobile browsers cancel the in-flight smooth scroll when the tapped element
+  // animates away — so the link appears dead. Fix: scroll the target ourselves
+  // (owned by the document, not the disappearing anchor), THEN close the sheet.
+  // scrollIntoView() with no args honours the CSS scroll-behavior + scroll-mt
+  // offset and respects prefers-reduced-motion, matching the desktop links.
+  function handleMobileNavClick(
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) {
+    if (!href.startsWith("#")) return; // external links (e.g. Resume) behave normally
+    event.preventDefault();
+    document.querySelector(href)?.scrollIntoView();
+    history.replaceState(null, "", href); // keep the URL/hash in sync, no extra jump
+    setOpen(false);
+  }
+
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
@@ -158,7 +176,7 @@ export default function Navbar() {
                 <li key={item.href}>
                   <a
                     href={item.href}
-                    onClick={() => setOpen(false)}
+                    onClick={(event) => handleMobileNavClick(event, item.href)}
                     className={`block rounded-lg px-3 py-3 text-base transition-colors ${
                       active === item.href
                         ? "bg-surface text-fg"
@@ -184,7 +202,7 @@ export default function Navbar() {
               <li>
                 <a
                   href="#contact"
-                  onClick={() => setOpen(false)}
+                  onClick={(event) => handleMobileNavClick(event, "#contact")}
                   className="block rounded-lg border border-accent/30 bg-accent/10 px-3 py-3 text-base font-medium text-accent"
                 >
                   Get in touch
