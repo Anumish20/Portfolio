@@ -44,32 +44,6 @@ export default function DeveloperJourney() {
         taught me, and the next question it sparked.
       </p>
 
-      {/* Subtle progress breadcrumb — the whole evolution at a glance */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-mono text-[11px]">
-        {journey.map((item, index) => (
-          <span key={item.label} className="flex items-center gap-1.5">
-            {index > 0 ? (
-              <span className="text-line" aria-hidden>
-                →
-              </span>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => setActive(index)}
-              className={`transition-colors ${
-                index === active
-                  ? "text-accent-2"
-                  : index < active
-                    ? "text-muted hover:text-fg"
-                    : "text-faint hover:text-muted"
-              }`}
-            >
-              {item.label}
-            </button>
-          </span>
-        ))}
-      </div>
-
       {/* Track */}
       <motion.ol
         initial="hidden"
@@ -146,49 +120,55 @@ export default function DeveloperJourney() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: EASE }}
           >
-            <div className="flex items-center gap-3">
-              <h4 className="text-xl font-semibold tracking-tight text-fg">{stop.label}</h4>
+            {/* Kicker — the milestone is secondary; the question is the story. */}
+            <div className="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-wider">
+              <span className="text-faint">
+                Stop {String(active + 1).padStart(2, "0")} · {stop.label}
+              </span>
               {isFrontierStop ? (
-                <span className="inline-flex items-center gap-1 rounded-full border border-accent-2/40 bg-accent-2/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent-2">
+                <span className="inline-flex items-center gap-1 rounded-full border border-accent-2/40 bg-accent-2/10 px-2 py-0.5 text-[10px] text-accent-2">
                   <Rocket size={10} />
                   new frontier
                 </span>
               ) : (
-                <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-faint">
+                <span className="rounded-full border border-line px-2 py-0.5 text-[10px] text-faint">
                   {stop.kind}
                 </span>
               )}
             </div>
 
-            <div className="mt-5 space-y-5">
-              {/* The question */}
-              <Field
-                icon={<HelpCircle size={14} />}
-                label="The question that pulled me here"
-              >
-                <span className="text-base italic leading-relaxed text-fg">
-                  “{stop.question}”
-                </span>
+            {/* The question — the hero of the whole stop */}
+            <div className="mt-4 flex gap-3">
+              <HelpCircle size={20} className="mt-1 shrink-0 text-accent-2" aria-hidden />
+              <p className="text-2xl font-semibold leading-snug tracking-tight text-fg">
+                {stop.question}
+              </p>
+            </div>
+
+            <div className="mt-6 space-y-5 border-t border-line pt-5">
+              {/* What chasing the question led me to do */}
+              <Field icon={<Compass size={14} />} label="What chasing it led me to do">
+                <span className="leading-relaxed text-muted">{stop.discovery}</span>
               </Field>
 
-              {/* What I learned */}
-              <Field icon={<GraduationCap size={14} />} label="What I learned">
+              {/* What answering it taught me */}
+              <Field icon={<GraduationCap size={14} />} label="What it taught me">
                 <span className="leading-relaxed text-muted">{stop.learned}</span>
               </Field>
 
-              {/* Curiosity → next question (or, on the frontier, what's opening up) */}
+              {/* The question it sparked → chains to the next stop */}
               <Field
-                icon={isFrontierStop ? <Compass size={14} /> : <ArrowRight size={14} />}
-                label={isFrontierStop ? "Where it's taking me next" : "...which made me wonder"}
+                icon={<ArrowRight size={14} />}
+                label={isFrontierStop ? "Where it's taking me next" : "The question it sparked"}
               >
                 <span className="leading-relaxed text-muted">{stop.next}</span>
                 {nextStop ? (
                   <button
                     type="button"
                     onClick={() => setActive(active + 1)}
-                    className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent transition-colors hover:border-accent/60 hover:bg-accent/15"
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:border-accent/60 hover:bg-accent/15"
                   >
-                    {nextStop.label}
+                    follow it to {nextStop.label}
                     <ArrowRight size={12} />
                   </button>
                 ) : null}

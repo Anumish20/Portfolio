@@ -14,9 +14,8 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
-import { FileText, Gauge, Menu, Sparkles, X } from "lucide-react";
+import { FileText, Menu, X } from "lucide-react";
 import { navItems, profile } from "@/lib/data";
-import { emitUiEvent, UI_EVENT } from "@/lib/ui-events";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -90,26 +89,8 @@ export default function Navbar() {
       }`}
     >
       <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
-        {/* Brand — opens the "field notes" personal reveal (not just scroll-top) */}
-        <button
-          type="button"
-          onClick={() => emitUiEvent(UI_EVENT.openProfile)}
-          title="Meet Anubhuti — open field notes"
-          aria-label="Meet Anubhuti — open field notes"
-          className="group flex items-center gap-2 font-mono text-sm font-semibold tracking-tight"
-        >
-          <span className="relative grid h-8 w-8 place-items-center rounded-lg border border-line bg-surface text-gradient transition-colors group-hover:border-accent/50">
-            {profile.initials}
-            <Sparkles
-              size={9}
-              className="absolute -right-1 -top-1 text-accent-2 opacity-0 transition-opacity group-hover:opacity-100"
-              aria-hidden
-            />
-          </span>
-          <span className="text-fg transition-colors group-hover:text-accent-2">
-            {profile.name.split(" ")[0]}
-          </span>
-        </button>
+        {/* No brand mark by design — the name lives once, in the hero, and is
+            the single trigger for the personal-profile discovery. */}
 
         {/* Desktop links */}
         <ul className="hidden items-center gap-1 md:flex">
@@ -141,14 +122,6 @@ export default function Navbar() {
 
         {/* Desktop CTAs */}
         <div className="hidden items-center gap-2 md:flex">
-          <button
-            type="button"
-            onClick={() => emitUiEvent(UI_EVENT.openRecruiter)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-medium text-accent transition-colors hover:border-accent/60 hover:bg-accent/15"
-          >
-            <Gauge size={15} />
-            Recruiter Mode
-          </button>
           <a
             href={profile.resumeUrl}
             target="_blank"
@@ -205,25 +178,12 @@ export default function Navbar() {
                 </li>
               ))}
               <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    emitUiEvent(UI_EVENT.openRecruiter);
-                  }}
-                  className="mt-1 flex w-full items-center gap-2 rounded-lg border border-accent/30 bg-accent/10 px-3 py-3 text-base font-medium text-accent"
-                >
-                  <Gauge size={17} />
-                  Recruiter Mode
-                </button>
-              </li>
-              <li>
                 <a
                   href={profile.resumeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-3 text-base font-medium text-fg"
+                  className="mt-1 flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-3 text-base font-medium text-fg"
                 >
                   <FileText size={17} />
                   Resume

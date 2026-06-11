@@ -48,6 +48,21 @@ export type Project = {
   highlights: string[];
   /** "How it works" data-flow, rendered as a connected step strip. */
   flow: string[];
+  /**
+   * A short, honest "debugging trace" — the hard part and how it was reasoned
+   * through. Deliberately HIDDEN: a recruiter uncovers it by interacting, so
+   * the card teaches "how I solve problems" instead of just listing features.
+   * NOTE FOR ANUBHUTI: verify each line maps to what you actually hit — these
+   * are drawn from your real highlights/learnings, not invented bugs.
+   */
+  debug: {
+    /** The hard part / the symptom worth chasing. */
+    challenge: string;
+    /** How the problem was traced — the reasoning, step by step. */
+    trace: string;
+    /** The thing that clicked — the root-cause-level takeaway. */
+    insight: string;
+  };
   /** Honest, learning-oriented takeaway. */
   learnings: string;
   stack: string[];
@@ -55,30 +70,10 @@ export type Project = {
   accent: "indigo" | "cyan";
 };
 
-export type Interest = {
-  title: string;
-  description: string;
-};
-
 export type SocialLink = {
   label: string;
   href: string;
   handle: string;
-};
-
-/**
- * "Behind the scenes" build notes — powers the live architecture inspector.
- * Each entry maps to a section id on the page and describes how that section
- * is ACTUALLY implemented. Keep these truthful: it's a self-documenting tour
- * of the real stack, not marketing.
- */
-export type BuildNote = {
-  /** Matches the section's DOM id (e.g. "projects"). */
-  id: string;
-  label: string;
-  /** "server" | "client" — rendered as a small badge. */
-  kind: "server" | "client";
-  notes: string[];
 };
 
 export const profile = {
@@ -113,7 +108,6 @@ export const navItems: NavItem[] = [
   { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
   { label: "Build", href: "#build" },
-  { label: "Interests", href: "#interests" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -164,6 +158,14 @@ export const projects: Project[] = [
       "Deployed publicly on Render with a managed MongoDB instance",
     ],
     flow: ["Client", "Express API (MVC)", "Mongoose models", "MongoDB", "Cloudinary (media)"],
+    debug: {
+      challenge:
+        "Letting users upload listing images without buffering big files through my own server or letting anyone edit a listing they didn't own.",
+      trace:
+        "I followed the request the whole way through. Instead of holding files in app memory, I streamed each upload straight to Cloudinary and persisted only the returned URL in MongoDB. Then I traced the edit/delete paths and put owner-only middleware in front of them, so the server checks identity before it ever touches the database.",
+      insight:
+        "Real backends are mostly about the edges — validation, auth, and deciding where heavy work should NOT happen. That's where the actual engineering lives, not in the happy path.",
+    },
     learnings:
       "Wiring auth, a database, and a third-party media service together taught me more about real backend trade-offs — validation, error handling, env config — than any tutorial could.",
     stack: ["Node.js", "Express", "MongoDB", "Mongoose", "Cloudinary", "EJS", "Render"],
@@ -199,6 +201,14 @@ export const projects: Project[] = [
       "Markdown rendering with syntax-highlighted, copyable code blocks",
     ],
     flow: ["React client", "Express API", "Ollama (local LLM)", "SSE token stream"],
+    debug: {
+      challenge:
+        "Making the assistant feel alive — tokens appearing one by one as the model thinks, instead of the UI freezing until the whole reply lands.",
+      trace:
+        "I stopped treating it as request/response and traced it as a stream. Express keeps the connection open, Ollama emits tokens as it generates, and the React client reads them off a Server-Sent Events stream and appends each chunk as it arrives — so the screen updates in real time instead of waiting for a final blob.",
+      insight:
+        "A chat UI is really a streaming problem wearing a text box. Once I owned the whole pipe — model, API, and client — the rest of the product finally made sense.",
+    },
     learnings:
       "Building the whole loop — a React UI, an Express streaming API, and a local model — taught me far more about real AI engineering than calling a hosted endpoint ever could.",
     stack: ["React", "TypeScript", "Node.js", "Express", "MongoDB", "Ollama", "Server-Sent Events"],
@@ -218,34 +228,36 @@ export const projects: Project[] = [
   },
 ];
 
-// Real hobbies, in Anubhuti's own framing — what he actually does and why.
-export const interests: Interest[] = [
-  {
-    title: "Building software",
-    description: "Taking an idea from an empty file all the way to something people can actually use.",
-  },
-  {
-    title: "Debugging",
-    description: "I genuinely enjoy finding the root cause — I usually learn more from a broken system than a working one.",
-  },
-  {
-    title: "Gaming",
-    description: "A good systems game scratches the same itch as a good codebase — strategy and problem-solving.",
-  },
-  {
-    title: "Learning new tech",
-    description: "Always pulling apart something new to understand how it works on the inside.",
-  },
-];
+/* ===========================================================================
+ * THOUGHTS — the four fragments revealed by clicking the name in the hero.
+ * One small, memorable discovery at a time (see components/ui/ThoughtCard).
+ * Curated hard: quality over quantity, ordered to build a personality
+ * narrative — debugging → obsession → reading → the line I live by.
+ * ======================================================================== */
+export type Thought = {
+  /** A short, lowercase mono label. */
+  label: string;
+  /** One short line — the discovery itself. */
+  body: string;
+};
 
-// What I read — the raw material most of my thinking starts from.
-export const readingInterests: string[] = [
-  "Fiction",
-  "Non-fiction",
-  "Psychology",
-  "Technology",
-  "Productivity",
-  "Human behaviour",
+export const thoughts: Thought[] = [
+  {
+    label: "why I enjoy debugging",
+    body: "I learn more from a broken system than a working one.",
+  },
+  {
+    label: "current obsession",
+    body: "AI systems · agentic workflows · understanding how things work.",
+  },
+  {
+    label: "what I'm reading",
+    body: "Fiction · Non-fiction · Psychology.",
+  },
+  {
+    label: "the line I live by",
+    body: "Excellence in action is Yoga.",
+  },
 ];
 
 export const socials: SocialLink[] = [
@@ -266,116 +278,12 @@ export const socials: SocialLink[] = [
   },
 ];
 
-export const buildNotes: BuildNote[] = [
-  {
-    id: "top",
-    label: "Hero",
-    kind: "client",
-    notes: [
-      "Framer Motion staggered entrance + AnimatePresence role switch",
-      "Ambient aurora & grid are pure CSS transforms (GPU-composited)",
-    ],
-  },
-  {
-    id: "about",
-    label: "About",
-    kind: "server",
-    notes: [
-      "Server Component — only a tiny client island for the field-notes button",
-      "Quote + philosophy share one source with the Field Notes reveal",
-      "Scroll reveal via IntersectionObserver (Framer whileInView, once)",
-    ],
-  },
-  {
-    id: "skills",
-    label: "Developer DNA",
-    kind: "server",
-    notes: [
-      "Honest tiers instead of fake proficiency bars",
-      "Developer Journey (HTML → AI) is a CSS scroll-progress rail",
-      "Fully data-driven from a single source (lib/data.ts)",
-    ],
-  },
-  {
-    id: "projects",
-    label: "Projects",
-    kind: "server",
-    notes: [
-      "SpotlightCard tracks the cursor with motion values — zero re-renders",
-      "Hover lift via Framer whileHover spring",
-    ],
-  },
-  {
-    id: "build",
-    label: "How it's built",
-    kind: "client",
-    notes: [
-      "Interactive build story — selecting a phase swaps the panel via AnimatePresence",
-      "Meta touch: this section documents the process that produced the site you're on",
-    ],
-  },
-  {
-    id: "interests",
-    label: "Interests",
-    kind: "client",
-    notes: ["Cards lift on hover via Framer whileHover"],
-  },
-  {
-    id: "contact",
-    label: "Contact",
-    kind: "client",
-    notes: [
-      "Real form → POST /api/contact",
-      "Zod validation → Prisma ORM → Neon PostgreSQL",
-      "Node.js runtime + node-postgres driver adapter",
-    ],
-  },
-];
-
 /* ===========================================================================
- * PERSONAL PROFILE — powers the clickable-name reveal (a premium side drawer).
- * Not an About card: a "hidden profile" you discover, revealed section by
- * section. Content is real (supplied by Anubhuti); keep it that way.
- * The drawer also reuses `interests` (hobbies) and `readingInterests` so the
- * personality details never drift between the page and the reveal.
- * ======================================================================== */
-
-// Three rules Anubhuti builds by — shared by the About section and the
-// profile reveal so they never drift apart.
-export const philosophy: string[] = ["Stay curious.", "Keep building.", "Learn through doing."];
-
-export const personalProfile = {
-  // The anchor of the whole piece — opens the reveal.
-  quote: "Excellence in action is Yoga.",
-  quoteReflection:
-    "I keep coming back to this. Software is a continuous loop of learning, building, debugging and improving — and progress comes from doing meaningful work consistently while staying curious.",
-  philosophy,
-  // What I'm deep in right now.
-  obsessions: ["AI Engineering", "Agentic Systems", "Understanding how systems work"],
-  // Actively learning, today.
-  learning: ["Next.js", "PostgreSQL", "AI Systems"],
-  // Why I enjoy debugging — the through-line a recruiter should remember.
-  mindset:
-    "Debugging is genuinely my favourite part. I break a complex problem into smaller pieces and chase the root cause until it makes sense — and I almost always learn more from a broken system than a working one. A bug is just the system telling me something I didn't understand yet.",
-  // The thing I'm building toward.
-  dreamProject: "Building practical AI products that people genuinely use.",
-  // NOTE FOR ANUBHUTI: these are drawn from what you've told me — tweak or
-  // swap any so they're 100% you. They're meant to feel human, not polished.
-  funFacts: [
-    "I'll happily lose an evening to a single bug — not just to fix it, but to understand exactly why it happened.",
-    "A good systems game and a clean codebase scratch the same part of my brain.",
-    "Most of my project ideas start in a book, not in an editor.",
-    "I'd rather understand how something works under the hood than just be told that it works.",
-    "This very profile was built human-in-the-loop with an AI pair — fitting, given the obsession.",
-  ],
-};
-
-/* ===========================================================================
- * DEVELOPER JOURNEY — the HTML → AI arc, folded into the Skills section.
- * Not a résumé timeline: an evolving thought process. Each stop is the
- * QUESTION that pulled Anubhuti there, what she LEARNED, and what it LED TO.
- * The `next` line names the following stop, so the chain reads as one
- * continuous thread of curiosity.
+ * CURIOSITY JOURNEY — the HTML → AI arc, folded into the Skills section.
+ * Not a résumé timeline: curiosity evolving into engineering. Each stop reads
+ * as a four-beat loop — the QUESTION that pulled me there, what I DISCOVERED
+ * by chasing it, what it taught me (LEARNED), and the NEXT question it sparked.
+ * The chain reads as one continuous thread.
  * ======================================================================== */
 export type JourneyStop = {
   label: string;
@@ -383,7 +291,9 @@ export type JourneyStop = {
   kind: "foundation" | "language" | "framework" | "runtime" | "data" | "frontier";
   /** The question that pulled me here. */
   question: string;
-  /** What I took away. */
+  /** What I actually did / found by chasing the question. */
+  discovery: string;
+  /** What it taught me. */
   learned: string;
   /** The itch / next question that led onward. */
   next: string;
@@ -396,6 +306,7 @@ export const journey: JourneyStop[] = [
     label: "HTML",
     kind: "foundation",
     question: "How does a webpage even exist?",
+    discovery: "Hand-wrote my first pages — headings, links, forms — and watched a browser turn plain text into a document.",
     learned: "Structure, semantics, and accessibility — that a page is a document before it's a design.",
     next: "It worked, but it looked plain. So: how do I control how it looks?",
   },
@@ -403,6 +314,7 @@ export const journey: JourneyStop[] = [
     label: "CSS",
     kind: "foundation",
     question: "Why does it look like that — and how do I shape it?",
+    discovery: "Rebuilt the same pages with layout, spacing, and colour until they finally looked deliberate.",
     learned: "Layout, the box model, and responsive design. Styling turned into a puzzle I actually enjoyed solving.",
     next: "The page still couldn't respond to me. Could it think back?",
   },
@@ -410,6 +322,7 @@ export const journey: JourneyStop[] = [
     label: "JavaScript",
     kind: "language",
     question: "Can a page actually react and respond?",
+    discovery: "Made buttons do things, content change on click, and the page respond to me for the first time.",
     learned: "State, events, and the DOM — the moment static became interactive. This is where it got addictive.",
     next: "Managing all that state by hand got messy fast. There had to be a cleaner way.",
   },
@@ -417,6 +330,7 @@ export const journey: JourneyStop[] = [
     label: "React",
     kind: "framework",
     question: "Is there a saner way to build and reuse UI?",
+    discovery: "Broke a sprawling interface into small components and reused them instead of repeating myself.",
     learned: "Components and composition — building interfaces as small, reusable pieces instead of one giant file.",
     next: "I owned the frontend, but only half the product. What's on the other side of the request?",
   },
@@ -424,6 +338,7 @@ export const journey: JourneyStop[] = [
     label: "Node.js",
     kind: "runtime",
     question: "What's really happening on the server?",
+    discovery: "Stood up my own API — routes, auth, request handling — and owned the back end, not just the screen.",
     learned: "APIs, auth, and request handling — how to own the whole loop instead of just the screen.",
     next: "An app is only as real as the data it remembers. Where does that actually live?",
   },
@@ -431,15 +346,17 @@ export const journey: JourneyStop[] = [
     label: "PostgreSQL",
     kind: "data",
     question: "Where does the data live, and how do I trust it?",
-    learned: "Relational modelling, schemas, and migrations — designing the data contract, not just storing rows. It's what backs the contact form on this very site, through Prisma.",
+    discovery: "Designed schemas and ran migrations — and wired the contact form on this very site through Prisma.",
+    learned: "Relational modelling, schemas, and migrations — designing the data contract, not just storing rows.",
     next: "With a full stack in hand, one question got louder than the rest.",
   },
   {
     label: "AI Engineering",
     kind: "frontier",
     question: "How are AI products actually built — from the inside?",
+    discovery: "Ran a local LLM myself, streamed its tokens over SSE, and built SigmaGPT end to end.",
     learned: "Local LLMs, token streaming, prompt design, and agentic systems — running the model myself instead of only calling an API.",
-    next: "And this is the part that doesn't have an end. It's not the finish line of the journey — it's the start of a much bigger one, and the most curious I've ever been.",
+    next: "And this is the part that doesn't have an end. It's not the finish line — it's the start of a much bigger one, and the most curious I've ever been.",
     frontier: [
       "AI agents",
       "Local LLMs",
@@ -451,92 +368,96 @@ export const journey: JourneyStop[] = [
 ];
 
 /* ===========================================================================
- * BUILD STORY — "How This Website Was Built".
+ * BUILD STORY — "Behind the Build".
  * The meta-project: this portfolio, built human-in-the-loop with Claude Code.
- * Each phase has the story AND a real prompt-evolution note, so it doubles as
- * evidence of prompt engineering and AI-assisted development.
+ * Each stage is deliberately tight — Problem → Decision → Outcome — plus an
+ * explicit human-in-the-loop split (what the AI did vs. what I owned). It's
+ * meant to answer "how does Anubhuti build software?", not "how to use Next.js".
  * ======================================================================== */
 export type BuildPhase = {
   phase: string;
-  /** One-line summary shown on the rail. */
-  summary: string;
-  /** The human-in-the-loop story for this phase. */
-  detail: string;
-  /** How the prompting / collaboration actually went here. */
-  craft: string;
+  /** The problem this stage faced — one line. */
+  problem: string;
+  /** The call I made — one line. */
+  decision: string;
+  /** What it produced — one line. */
+  outcome: string;
+  /** Human-in-the-loop split: what Claude Code did vs. what I owned. */
+  loop: { ai: string; me: string };
 };
 
 export const buildStory: BuildPhase[] = [
   {
     phase: "Idea",
-    summary: "A portfolio that proves how I work, not just what I made.",
-    detail:
-      "I didn't want another template. The goal was a site that itself demonstrates an AI-first engineering workflow — honest about the stack, honest about the process.",
-    craft: "Started by writing the brief as if onboarding a teammate: constraints, taste, and what 'done' meant — before any code.",
+    problem: "Another template that lists what I know wouldn't be remembered.",
+    decision: "Make the site itself prove how I work — built with AI, honest about the process.",
+    outcome: "A portfolio with a point of view instead of a checklist.",
+    loop: {
+      ai: "Nothing yet — on purpose.",
+      me: "Wrote the brief like I was onboarding a teammate.",
+    },
   },
   {
     phase: "Planning",
-    summary: "Design system and content model before pixels.",
-    detail:
-      "Decided the dark premium theme, the indigo→cyan accent, and a single source of truth for content (lib/data.ts) so the site could grow without touching JSX.",
-    craft: "Prompts moved from 'build a hero' to 'here are my tokens and primitives — compose within them.' Setting the system up front made every later prompt cheaper.",
+    problem: "Ad-hoc styling and scattered copy would rot the moment the site grew.",
+    decision: "Lock in design tokens and one content source (lib/data.ts) before any UI.",
+    outcome: "Every later change is a single edit — never a hunt through JSX.",
+    loop: {
+      ai: "Proposed the token system and file structure.",
+      me: "Chose the palette, the taste, and the constraints.",
+    },
   },
   {
     phase: "Claude Code",
-    summary: "Pair-building section by section.",
-    detail:
-      "I drove direction and taste; Claude Code handled scaffolding, motion wiring, and the tedious parts. Every component was reviewed and adjusted, not accepted blindly.",
-    craft: "The unlock was specificity: referencing real files, naming the exact component to match, and giving feedback in terms of intent ('feels gimmicky') instead of code.",
+    problem: "Scaffolding and motion wiring eat the hours — not the thinking.",
+    decision: "Pair-build: Claude writes the boilerplate, I drive direction and review every diff.",
+    outcome: "Fast to build, with nothing accepted blindly.",
+    loop: {
+      ai: "Scaffolded components and wired the animations.",
+      me: "Set the direction and reviewed each change before it stayed.",
+    },
   },
   {
-    phase: "Iterations",
-    summary: "Tighten taste, kill anything that felt generic.",
-    detail:
-      "Several passes removed clichés — fake proficiency bars became honest tiers, invented metrics were cut, animations were calmed down until they felt premium, not flashy.",
-    craft: "Prompts evolved from 'add features' to 'would a recruiter remember this after 100 portfolios? If not, redesign it.' Editing taste, not just code.",
+    phase: "Iteration",
+    problem: "The first drafts looked competent but generic.",
+    decision: "Cut the clichés — fake proficiency bars became honest tiers; motion got calmer.",
+    outcome: "It started to feel like mine, not a theme I downloaded.",
+    loop: {
+      ai: "Generated variations on request.",
+      me: "Judged taste — 'feels gimmicky', 'too much', 'calmer'.",
+    },
   },
   {
     phase: "Debugging",
-    summary: "The part I actually enjoy.",
-    detail:
-      "Real bugs, real root causes — e.g. mobile nav links appeared dead because the closing sheet cancelled the in-flight smooth scroll. Fixed by scrolling the document, then closing.",
-    craft: "I treat the model as a debugging partner: describe the symptom precisely, form a hypothesis together, then verify — instead of pasting an error and hoping.",
+    problem: "On mobile, the nav links looked dead — taps did nothing.",
+    decision: "Hypothesis first: the closing sheet cancels the in-flight scroll. Scroll, then close.",
+    outcome: "Fixed at the root cause, not patched over — the part I enjoy most.",
+    loop: {
+      ai: "Helped me trace the hypothesis through the code.",
+      me: "Reproduced it, verified the fix, confirmed the root cause.",
+    },
   },
   {
     phase: "PostgreSQL",
-    summary: "A real backend, not a mailto: link.",
-    detail:
-      "The contact form posts to a Next.js route handler, validates with Zod, and persists to Neon PostgreSQL through Prisma — with a live /api/health endpoint to prove it.",
-    craft: "Moved from 'make a form' to 'validate at the edge, type the data model, and surface a health check' — designing the contract, not just the happy path.",
+    problem: "A mailto: link isn't a backend — I wanted something real.",
+    decision: "Contact form → Zod validation → Prisma → Neon Postgres, with a live /api/health route.",
+    outcome: "Messages persist in a real database, and the connection is provable.",
+    loop: {
+      ai: "Wrote the route handler and the schema.",
+      me: "Designed the data contract and the health check.",
+    },
   },
   {
     phase: "Deployment",
-    summary: "Shipped, and self-documenting.",
-    detail:
-      "Deployed on Vercel with the database migration running in the build. The 'how it's built' inspector means the live site narrates its own architecture as you scroll.",
-    craft: "The last prompt wasn't about code at all — it was 'what would make this unforgettable without making it try too hard?' Curation over addition.",
+    problem: "The last 10% is knowing what to cut, not what to add.",
+    decision: "Ship on Vercel with the migration in the build; remove anything that doesn't earn its place.",
+    outcome: "Live, lean, and self-documenting — this section included.",
+    loop: {
+      ai: "Handled the deploy config and migration wiring.",
+      me: "Decided what made the final cut.",
+    },
   },
 ];
-
-/* ===========================================================================
- * RECRUITER BRIEF — powers "Recruiter Mode": evaluate in ~60 seconds.
- * Curated, scannable, links straight to proof.
- * ======================================================================== */
-export const recruiterBrief = {
-  pitch:
-    "Full-stack developer (React · Next.js · Node.js) who ships end-to-end products and is going deep on AI engineering — local LLMs, agentic systems, and AI-assisted development.",
-  stack: {
-    Frontend: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-    Backend: ["Node.js", "Express", "Next.js Route Handlers", "Zod"],
-    Data: ["PostgreSQL (Neon)", "Prisma", "MongoDB"],
-    "AI / Tooling": ["Local LLMs (Ollama)", "Prompt engineering", "Claude Code", "Git"],
-  } as Record<string, string[]>,
-  ai: [
-    "Built SigmaGPT — a local-first ChatGPT-style assistant with token streaming over SSE.",
-    "Hands-on with local LLM inference (Ollama), prompt design, and AI-assisted development.",
-    "This portfolio was itself built human-in-the-loop with Claude Code.",
-  ],
-};
 
 export const siteMeta = {
   title: `${profile.name} — Full-Stack Developer`,

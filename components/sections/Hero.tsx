@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown, ArrowUpRight, FileText, Mail } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/BrandIcons";
 import MotionLink from "@/components/ui/MotionLink";
+import ThoughtCard from "@/components/ui/ThoughtCard";
 import { profile, socials } from "@/lib/data";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 
@@ -28,6 +29,7 @@ const socialIcon = {
 
 export default function Hero() {
   const [roleIndex, setRoleIndex] = useState(0);
+  const [thoughtsOpen, setThoughtsOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,18 +68,35 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* Name */}
-        <motion.h1
-          variants={staggerItem}
-          className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight sm:text-7xl"
-        >
-          Hi, I&apos;m <span className="text-gradient">{profile.name}</span>.
-        </motion.h1>
+        {/* Name — looks normal at rest; on hover it reveals it's a doorway.
+            Clicking it unfolds one small thought (ThoughtCard), anchored here. */}
+        <motion.div variants={staggerItem} className="relative mt-6">
+          <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight sm:text-7xl">
+            Hi, I&apos;m{" "}
+            <button
+              type="button"
+              onClick={() => setThoughtsOpen((value) => !value)}
+              aria-expanded={thoughtsOpen}
+              aria-label="Reveal a thought from Anubhuti"
+              className="group relative inline-block text-gradient outline-none"
+            >
+              {profile.name}
+              {/* hover/focus-only underline — nothing forced when idle */}
+              <span
+                aria-hidden
+                className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-accent to-accent-2 opacity-0 transition-all duration-300 group-hover:scale-x-100 group-hover:opacity-90 group-focus-visible:scale-x-100 group-focus-visible:opacity-90"
+              />
+            </button>
+            .
+          </h1>
+
+          <ThoughtCard open={thoughtsOpen} onClose={() => setThoughtsOpen(false)} />
+        </motion.div>
 
         {/* Rotating role */}
         <motion.div
           variants={staggerItem}
-          className="mt-4 flex h-8 items-center gap-3 font-mono text-lg text-muted sm:text-xl"
+          className="mt-5 flex h-8 items-center gap-3 font-mono text-lg text-muted sm:text-xl"
         >
           <span className="text-faint">{"//"}</span>
           <span className="relative inline-block">

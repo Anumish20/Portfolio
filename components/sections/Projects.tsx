@@ -21,6 +21,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import Reveal from "@/components/ui/Reveal";
 import Pill from "@/components/ui/Pill";
 import SpotlightCard from "@/components/ui/SpotlightCard";
+import ProjectDebugTrace from "@/components/ui/ProjectDebugTrace";
 import { GithubIcon } from "@/components/ui/BrandIcons";
 import { ArrowUpRight, Check } from "lucide-react";
 import { projects } from "@/lib/data";
@@ -148,6 +149,10 @@ export default function Projects() {
                     </div>
                   </div>
                 </div>
+
+                {/* Discovery: the engineering story is uncovered, not dumped —
+                    this is the "how I solve problems" moment. */}
+                <ProjectDebugTrace debug={project.debug} />
 
                 {/* Links */}
                 <div className="mt-8 border-t border-line pt-6">

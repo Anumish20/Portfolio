@@ -1,28 +1,28 @@
 "use client";
 
 /**
- * components/sections/BuildStory.tsx  →  "How This Website Was Built"
+ * components/sections/BuildStory.tsx  →  "Behind the Build"
  * -------------------------------------------------------------------------
  * The meta-project: this portfolio, built human-in-the-loop with Claude Code.
  *
- * An interactive pipeline (Idea → Planning → Claude Code → Iterations →
- * Debugging → PostgreSQL → Deployment). Selecting a phase swaps a detail
- * panel that tells the story AND shows how the prompting/collaboration
- * actually evolved — so the section doubles as evidence of prompt
- * engineering and an AI-first workflow.
+ * Answers one question — "how does Anubhuti build software?" — not "how to use
+ * Next.js". A rail of stages (Idea → Planning → Claude Code → Iteration →
+ * Debugging → PostgreSQL → Deployment); selecting one swaps a deliberately
+ * TIGHT panel: Problem → Decision → Outcome, plus an explicit human-in-the-loop
+ * split so it's obvious the AI accelerated the work while the judgment stayed
+ * mine. Scannable in under a minute by design — no documentation, no dump.
  *
- * Data: buildStory (lib/data.ts). Client Component for the selection state;
- * reuses the server-rendered Section/SectionHeading shells for consistency.
+ * Data: buildStory (lib/data.ts). Client Component for the selection state.
  * -------------------------------------------------------------------------
  */
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Check, Compass, HelpCircle, Terminal } from "lucide-react";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Reveal from "@/components/ui/Reveal";
-import { buildStory } from "@/lib/data";
+import { buildStory, profile } from "@/lib/data";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -34,15 +34,15 @@ export default function BuildStory() {
     <Section id="build">
       <Reveal>
         <SectionHeading
-          eyebrow="How this was built"
-          title="The site is itself a build story."
-          subtitle="This portfolio was built human-in-the-loop with Claude Code — I drove the direction and taste, the model handled scaffolding and the tedious parts. Walk the pipeline; each step shows the process and how the prompting evolved."
+          eyebrow="Behind the build"
+          title="How I actually build software."
+          subtitle="This whole site, built human-in-the-loop with Claude Code. Each stage is one problem, the call I made, and what shipped — plus who did what. I set the direction and the taste; the AI moved faster on the parts that aren't the thinking."
         />
       </Reveal>
 
       <Reveal delay={0.1}>
-        <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,300px)_1fr]">
-          {/* Pipeline rail */}
+        <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,260px)_1fr]">
+          {/* Stage rail */}
           <ol className="relative flex gap-3 overflow-x-auto pb-2 lg:flex-col lg:gap-0 lg:overflow-visible lg:pb-0">
             {buildStory.map((step, index) => {
               const isActive = index === active;
@@ -107,22 +107,69 @@ export default function BuildStory() {
                 transition={{ duration: 0.3, ease: EASE }}
               >
                 <span className="font-mono text-xs uppercase tracking-[0.2em] text-accent-2">
-                  Phase {String(active + 1).padStart(2, "0")}
+                  Stage {String(active + 1).padStart(2, "0")} / {String(buildStory.length).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
                   {phase.phase}
                 </h3>
-                <p className="mt-2 text-base text-muted">{phase.summary}</p>
 
-                <p className="mt-6 leading-relaxed text-muted">{phase.detail}</p>
+                {/* Problem → Decision → Outcome — a tight, scannable spec */}
+                <dl className="mt-6 overflow-hidden rounded-xl border border-line">
+                  <SpecRow
+                    icon={<HelpCircle size={13} />}
+                    label="Problem"
+                    tone="text-faint"
+                  >
+                    <span className="text-muted">{phase.problem}</span>
+                  </SpecRow>
+                  <SpecRow
+                    icon={<Compass size={13} />}
+                    label="Decision"
+                    tone="text-accent"
+                    divider
+                  >
+                    <span className="text-fg">{phase.decision}</span>
+                  </SpecRow>
+                  <SpecRow
+                    icon={<Check size={13} />}
+                    label="Outcome"
+                    tone="text-accent-2"
+                    divider
+                  >
+                    <span className="font-medium text-fg">{phase.outcome}</span>
+                  </SpecRow>
+                </dl>
 
-                {/* Prompt-craft callout */}
-                <div className="mt-6 rounded-xl border border-line bg-surface-2/60 p-4">
-                  <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-accent">
-                    <Sparkles size={13} />
-                    how the prompting evolved
+                {/* Human-in-the-loop — who did what, made explicit */}
+                <div className="mt-6 rounded-xl border border-line bg-surface-2/50 p-4 sm:p-5">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent-2">
+                    Human-in-the-loop
                   </p>
-                  <p className="mt-2 text-sm leading-relaxed text-fg">{phase.craft}</p>
+                  <div className="mt-3.5 grid gap-3 sm:grid-cols-2">
+                    <Role
+                      badge={
+                        <span className="inline-flex items-center gap-1.5">
+                          <Terminal size={12} />
+                          Claude Code
+                        </span>
+                      }
+                    >
+                      {phase.loop.ai}
+                    </Role>
+                    <Role
+                      badge={
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="font-mono text-[10px] tracking-tight">
+                            {profile.initials}
+                          </span>
+                          {profile.name.split(" ")[0]}
+                        </span>
+                      }
+                      mine
+                    >
+                      {phase.loop.me}
+                    </Role>
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -130,5 +177,62 @@ export default function BuildStory() {
         </div>
       </Reveal>
     </Section>
+  );
+}
+
+/* ---------- A labelled Problem/Decision/Outcome row ---------- */
+
+function SpecRow({
+  icon,
+  label,
+  tone,
+  divider = false,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  tone: string;
+  divider?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3.5 sm:px-5 ${
+        divider ? "border-t border-line" : ""
+      }`}
+    >
+      <dt className={`flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider ${tone}`}>
+        <span aria-hidden>{icon}</span>
+        {label}
+      </dt>
+      <dd className="text-sm leading-relaxed">{children}</dd>
+    </div>
+  );
+}
+
+/* ---------- One side of the human-in-the-loop split ---------- */
+
+function Role({
+  badge,
+  mine = false,
+  children,
+}: {
+  badge: React.ReactNode;
+  mine?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-lg border border-line bg-bg/40 p-3">
+      <span
+        className={`inline-flex rounded-full border px-2.5 py-1 font-mono text-[11px] ${
+          mine
+            ? "border-accent/30 bg-accent/10 text-accent"
+            : "border-accent-2/30 bg-accent-2/10 text-accent-2"
+        }`}
+      >
+        {badge}
+      </span>
+      <p className="mt-2.5 text-sm leading-relaxed text-muted">{children}</p>
+    </div>
   );
 }

@@ -2,8 +2,9 @@
  * app/page.tsx
  * -------------------------------------------------------------------------
  * Home page — the single route of the portfolio.
- *  - Composes the sections in deliberate narrative order:
- *    Hero → About → Skills → Projects → Interests → Contact.
+ *  - One continuous narrative: curiosity → tools → projects → process → talk.
+ *    SectionBridges hand the story from one section to the next so the page
+ *    reads as a thread, not a stack of blocks.
  *  - Navbar/Footer frame the content; the <main> holds the story.
  *  Server Component: each section manages its own client interactivity.
  * -------------------------------------------------------------------------
@@ -16,11 +17,8 @@ import About from "@/components/sections/About";
 import Skills from "@/components/sections/Skills";
 import Projects from "@/components/sections/Projects";
 import BuildStory from "@/components/sections/BuildStory";
-import Interests from "@/components/sections/Interests";
 import ContactSection from "@/components/sections/ContactSection";
-import BehindTheScenes from "@/components/ui/BehindTheScenes";
-import ProfileReveal from "@/components/ui/ProfileReveal";
-import RecruiterMode from "@/components/ui/RecruiterMode";
+import SectionBridge from "@/components/ui/SectionBridge";
 
 export default function Home() {
   return (
@@ -28,19 +26,18 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <SectionBridge>it starts with curiosity</SectionBridge>
         <About />
+        <SectionBridge>curiosity, sharpened into tools</SectionBridge>
         <Skills />
+        <SectionBridge>tools, turned into things I shipped</SectionBridge>
         <Projects />
+        <SectionBridge>and this is how I build them</SectionBridge>
         <BuildStory />
-        <Interests />
+        <SectionBridge>so — let&apos;s build something</SectionBridge>
         <ContactSection />
       </main>
       <Footer />
-      <BehindTheScenes />
-
-      {/* App-wide overlays, opened from the navbar via the UI event bus. */}
-      <ProfileReveal />
-      <RecruiterMode />
     </>
   );
 }
