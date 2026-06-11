@@ -1,8 +1,19 @@
 # Anubhuti Mishra — Portfolio
 
 A full-stack developer portfolio built with Next.js. More than a static page: it
-ships a real database-backed contact form, a live DB health probe, and a
-"behind the scenes" inspector that documents how each section is actually built.
+ships a real database-backed contact form and a live DB health probe, and it
+demonstrates the engineering process behind it rather than just listing skills.
+
+Signature touches:
+
+- **One discovery, not a wall of text** — clicking the name in the hero unfolds a
+  small "field notes" thought card, one idea at a time.
+- **Curiosity Journey** — the HTML→AI path told as a chain of questions
+  (Question → Discovery → Learning → Next Question), not a skills timeline.
+- **Behind the Build** — each stage (Idea → Planning → Claude Code → Iteration →
+  Debugging → PostgreSQL → Deployment) as Problem → Decision → Outcome, with an
+  explicit human-in-the-loop split.
+- **Real backend** — a Zod-validated contact form that persists to Postgres.
 
 **Live:** https://anubhuti-portfolio.vercel.app/
 

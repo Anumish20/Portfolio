@@ -463,5 +463,5 @@ export const siteMeta = {
   title: `${profile.name} — Full-Stack Developer`,
   description:
     "Portfolio of Anubhuti Mishra, a full-stack developer (React, Next.js, Node.js) actively learning AI engineering.",
-  url: "https://anubhuti-mishra.vercel.app",
+  url: "https://anubhuti-portfolio.vercel.app",
 };
