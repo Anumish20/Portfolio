@@ -12,7 +12,7 @@
  * -------------------------------------------------------------------------
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { FileText, Menu, X } from "lucide-react";
 import { navItems, profile } from "@/lib/data";
@@ -21,6 +21,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState<string>("");
   const [open, setOpen] = useState(false);
+  // The in-page target a mobile tap is heading to. We scroll to it only AFTER
+  // the menu sheet has finished exiting (see AnimatePresence onExitComplete),
+  // never in the same tick as setOpen — otherwise the unmount cancels the
+  // in-flight smooth scroll on mobile and the link looks dead.
+  const pendingHash = useRef<string | null>(null);
 
   // Reading-progress bar: smooth the raw scroll value with a spring so the
   // bar glides rather than jitters.
@@ -60,21 +65,32 @@ export default function Navbar() {
   }, []);
 
   // Mobile menu links live inside an AnimatePresence sheet that unmounts on
-  // tap. Relying on the anchor's default hash-scroll races that unmount, and
-  // mobile browsers cancel the in-flight smooth scroll when the tapped element
-  // animates away — so the link appears dead. Fix: scroll the target ourselves
-  // (owned by the document, not the disappearing anchor), THEN close the sheet.
-  // scrollIntoView() with no args honours the CSS scroll-behavior + scroll-mt
-  // offset and respects prefers-reduced-motion, matching the desktop links.
+  // tap. The tapped anchor animates away, and mobile browsers cancel an
+  // in-flight smooth scroll when the initiating element is removed — so doing
+  // the scroll in the same tick as closing the sheet makes the link look dead
+  // (closing always overlaps the ~300-500ms scroll). Fix: record the target,
+  // close the sheet, and run the scroll from the sheet's onExitComplete — i.e.
+  // once it has fully exited and the DOM is stable, when nothing can cancel it.
   function handleMobileNavClick(
     event: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) {
     if (!href.startsWith("#")) return; // external links (e.g. Resume) behave normally
     event.preventDefault();
+    pendingHash.current = href; // scrolled in onExitComplete, not now
+    setOpen(false);
+  }
+
+  // Runs after the mobile sheet has fully animated out and unmounted. The DOM
+  // is settled here, so scrollIntoView() can't be interrupted. No-args honours
+  // the CSS scroll-behavior + scroll-mt offset and prefers-reduced-motion,
+  // matching the desktop links. No-ops if the menu was closed without a tap.
+  function handleSheetExited() {
+    const href = pendingHash.current;
+    if (!href) return;
+    pendingHash.current = null;
     document.querySelector(href)?.scrollIntoView();
     history.replaceState(null, "", href); // keep the URL/hash in sync, no extra jump
-    setOpen(false);
   }
 
   return (
@@ -152,7 +168,7 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile sheet */}
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={handleSheetExited}>
         {open ? (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
