@@ -19,6 +19,7 @@
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Reveal from "@/components/ui/Reveal";
+import DeveloperJourney from "@/components/ui/DeveloperJourney";
 import { developerDna, type DnaTier } from "@/lib/data";
 
 const tierConfig: Record<
@@ -95,6 +96,11 @@ export default function Skills() {
             );
           })}
         </div>
+      </Reveal>
+
+      {/* Developer Journey — how curiosity drove the path from HTML to AI. */}
+      <Reveal delay={0.1} className="mt-6">
+        <DeveloperJourney />
       </Reveal>
     </Section>
   );

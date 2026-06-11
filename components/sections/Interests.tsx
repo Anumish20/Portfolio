@@ -16,7 +16,7 @@ import { motion } from "framer-motion";
 import Section from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Reveal from "@/components/ui/Reveal";
-import { interests } from "@/lib/data";
+import { interests, readingInterests } from "@/lib/data";
 import { hoverLift, microSpring } from "@/lib/motion";
 
 export default function Interests() {
@@ -47,6 +47,28 @@ export default function Interests() {
           </Reveal>
         ))}
       </div>
+
+      {/* What I read — long-form is where most of the thinking starts. */}
+      <Reveal delay={0.1} className="mt-6">
+        <div className="rounded-2xl border border-line bg-surface p-6 sm:p-7">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent-2">
+            On my reading list
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            Long-form across fiction and non-fiction — most of my ideas start here.
+          </p>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {readingInterests.map((topic) => (
+              <li
+                key={topic}
+                className="rounded-full border border-line bg-surface-2 px-3 py-1.5 text-sm text-muted transition-colors hover:border-accent/40 hover:text-fg"
+              >
+                {topic}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Reveal>
     </Section>
   );
 }

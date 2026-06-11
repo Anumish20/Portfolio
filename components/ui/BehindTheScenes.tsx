@@ -106,6 +106,8 @@ export default function BehindTheScenes() {
   }, [open]);
 
   const active = buildNotes.find((note) => note.id === activeId) ?? buildNotes[0];
+  const serverCount = buildNotes.filter((note) => note.kind === "server").length;
+  const clientCount = buildNotes.length - serverCount;
 
   const healthDot =
     health.state === "ok"
@@ -204,6 +206,19 @@ export default function BehindTheScenes() {
                   {healthLabel}
                 </span>
                 <span className="ml-auto text-faint">live · /api/health</span>
+              </div>
+
+              {/* Architecture at a glance — section makeup across the page */}
+              <div className="mt-3 flex items-center gap-3 text-[11px] text-faint">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-sm bg-accent/60" aria-hidden />
+                  {serverCount} server
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-sm bg-accent-2/60" aria-hidden />
+                  {clientCount} client
+                </span>
+                <span className="ml-auto">{buildNotes.length} sections mapped</span>
               </div>
 
               <p className="mt-2 text-[11px] text-faint">
