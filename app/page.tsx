@@ -17,6 +17,7 @@ import About from "@/components/sections/About";
 import Skills from "@/components/sections/Skills";
 import Projects from "@/components/sections/Projects";
 import BuildStory from "@/components/sections/BuildStory";
+import OffTheClock from "@/components/sections/OffTheClock";
 import ContactSection from "@/components/sections/ContactSection";
 import SectionBridge from "@/components/ui/SectionBridge";
 
@@ -34,6 +35,8 @@ export default function Home() {
         <Projects />
         <SectionBridge>and this is how I build them</SectionBridge>
         <BuildStory />
+        <SectionBridge>but I&apos;m more than the code</SectionBridge>
+        <OffTheClock />
         <SectionBridge>so — let&apos;s build something</SectionBridge>
         <ContactSection />
       </main>

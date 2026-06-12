@@ -40,6 +40,9 @@ export type Project = {
   domain: "Full-Stack" | "AI Engineering";
   role: string;
   status: "live" | "in-progress";
+  /** Marks the strongest, lead build — surfaces a "Signature build" badge so a
+   *  recruiter's eye lands here first. Keep at most one true. */
+  signature?: boolean;
   /** One-line overview shown under the title. */
   summary: string;
   /** Why the project exists / what it solves — sets up the story. */
@@ -108,6 +111,7 @@ export const navItems: NavItem[] = [
   { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
   { label: "Build", href: "#build" },
+  { label: "Off the clock", href: "#off-the-clock" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -189,6 +193,7 @@ export const projects: Project[] = [
     domain: "AI Engineering",
     role: "Solo full-stack build",
     status: "live",
+    signature: true,
     summary:
       "A ChatGPT-style assistant that runs entirely on your own machine through Ollama — no accounts, no cloud, your conversations stay yours.",
     problem:
@@ -257,6 +262,79 @@ export const thoughts: Thought[] = [
   {
     label: "the line I live by",
     body: "Excellence in action is Yoga.",
+  },
+];
+
+/* ===========================================================================
+ * OFF THE CLOCK — the human behind the commits.
+ * A small, playful personality grid (see components/sections/OffTheClock).
+ * The section renders a shuffled SUBSET of this pool and lets a visitor
+ * reshuffle it — so it feels alive, like a person rather than a CV.
+ *
+ * NOTE FOR ANUBHUTI: these are TRUE categories you confirmed (reading, gaming,
+ * music, movement/yoga) but the one-liners are deliberately editable. Make each
+ * `note` specifically YOU — a book you actually loved, a game you sink hours
+ * into, an artist on repeat. Specific beats generic every time. Keep it honest.
+ * ======================================================================== */
+export type Interest = {
+  /** Decorative glyph marker. */
+  glyph: string;
+  /** Short title. */
+  title: string;
+  /** One honest, specific line. */
+  note: string;
+  /** Loose category — drives the accent tint. */
+  tag: "reading" | "gaming" | "music" | "movement";
+};
+
+export const offTheClock: Interest[] = [
+  {
+    glyph: "📖",
+    title: "Lost in a book",
+    note: "Fiction to escape, psychology to understand why we do what we do.",
+    tag: "reading",
+  },
+  {
+    glyph: "🧠",
+    title: "Why we tick",
+    note: "Psychology and non-fiction — debugging people the way I debug code.",
+    tag: "reading",
+  },
+  {
+    glyph: "🎮",
+    title: "One more round",
+    note: "Games are just systems with a feedback loop — I can't help but optimise them.",
+    tag: "gaming",
+  },
+  {
+    glyph: "🕹️",
+    title: "Late-night runs",
+    note: "The kind of game that quietly eats an evening before you notice.",
+    tag: "gaming",
+  },
+  {
+    glyph: "🎧",
+    title: "Always a soundtrack",
+    note: "Code goes down smoother with the right thing playing — there's always a queue.",
+    tag: "music",
+  },
+  {
+    glyph: "🎵",
+    title: "On repeat",
+    note: "One track on loop until a problem cracks. Don't ask how many times.",
+    tag: "music",
+  },
+  {
+    glyph: "🧘",
+    title: "Excellence in action",
+    note: "Yoga and movement — “yogah karmasu kaushalam”, the line I actually live by.",
+    tag: "movement",
+  },
+  {
+    glyph: "💪",
+    title: "Away from the screen",
+    note: "Moving the body so the head stays clear — the best debugger is a walk.",
+    tag: "movement",
   },
 ];
 

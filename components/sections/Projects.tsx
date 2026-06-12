@@ -23,7 +23,7 @@ import Pill from "@/components/ui/Pill";
 import SpotlightCard from "@/components/ui/SpotlightCard";
 import ProjectDebugTrace from "@/components/ui/ProjectDebugTrace";
 import { GithubIcon } from "@/components/ui/BrandIcons";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight, Check, Sparkles } from "lucide-react";
 import { projects } from "@/lib/data";
 
 export default function Projects() {
@@ -62,15 +62,23 @@ export default function Projects() {
                     </p>
                   </div>
 
-                  {project.status === "live" ? (
-                    <Pill variant="status" dot className="shrink-0">
-                      Live
-                    </Pill>
-                  ) : (
-                    <span className="shrink-0 rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium text-faint">
-                      In progress
-                    </span>
-                  )}
+                  <div className="flex shrink-0 items-center gap-2">
+                    {project.signature ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-gradient-to-r from-accent/15 to-accent-2/15 px-3 py-1 text-xs font-semibold text-accent-2">
+                        <Sparkles size={13} aria-hidden />
+                        Signature build
+                      </span>
+                    ) : null}
+                    {project.status === "live" ? (
+                      <Pill variant="status" dot>
+                        Live
+                      </Pill>
+                    ) : (
+                      <span className="rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium text-faint">
+                        In progress
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Lead summary */}
