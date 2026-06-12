@@ -15,7 +15,7 @@ Signature touches:
   explicit human-in-the-loop split.
 - **Real backend** — a Zod-validated contact form that persists to Postgres.
 
-**Live:** https://anubhuti-portfolio.vercel.app/
+**Live:** https://anubhutiportfolio.vercel.app//
 
 ## Tech stack
 
